@@ -183,6 +183,7 @@ int	ft_atoi_for_addZero(const char *s)
 		return(0);
 	return(res);
 }
+
 int ft_atoi_for_space(const char *s)
 {
 	int i;
@@ -206,7 +207,6 @@ int ft_atoi_for_space(const char *s)
 		return(0);
 	return(res);
 }
-
 
 char	*join_char_to_str(char *s, char c)
 {
@@ -275,8 +275,6 @@ int lenX(unsigned int num, char  *to)
 	}
 	return(i);
 }
-
-
 
 int printSpace(int *addSpaceAfter, int len)
 {
@@ -355,7 +353,7 @@ int ft_printf(const char *conv, ...)
 				addOX = 1;
 				i++;
 			}
-			if(conv[i] == '.') //ad space in case there is number after dot
+			if(conv[i] == '.') //add space in case there is number after dot
 			{
 			//	cutoutput = ft_at
 			}

@@ -425,7 +425,7 @@ int ft_printf(const char *conv, ...)
 				c = va_arg(args,int);
 				j += printSpace(&addSpaceBefore, 1);
  				j += ft_putchar(c);
-				j += printSpace(&addSpaceAfter, 1);				
+				j += printSpace(&addSpaceAfter, 2);				
 			}
 			if(conv[i] == 's')
 			{
@@ -439,7 +439,7 @@ int ft_printf(const char *conv, ...)
 				p = (unsigned long long)va_arg(args, void *);
 				j += printSpace(&addSpaceBefore, j + 2 + lenP(p));
 				j += ft_putstr("0x") + convertfromDec_P(p,'x');
-				j += printSpace(&addSpaceAfter, j);
+				j += printSpace(&addSpaceAfter, 2 + lenP(p) + 1); // +1 for \0
 			}
 			if(conv[i] == 'i' || conv[i] == 'd')
 			{
@@ -505,21 +505,27 @@ int main(void)
 	//ptr = 0x124456454564;
 	unsigned long int m = (unsigned long int)ptr;
 
-//	printf ("<%-25d>\n", x);
-//	ft_printf ("<%-25d>\n", x);
-//	printf ("<%-25s>\n", str);
-//	ft_printf ("<%-25s>\n", str);
-//	printf ("<%-25c>\n", c);
-//	ft_printf ("<%-25c>\n", c);
-	//printf ("<%-25u || %-25p>\n", x, ptr);
-	//ft_printf ("<%-25u || %-25p>\n", x, ptr);
-	printf("|yy%20p|\n", ptr);
-	ft_printf("|yy%20p|\n", ptr);
-
-	//printf("3. %d\n", lenP((uintptr_t)ptr));
-
-
-
-	//ft_printf ("<%-25p>\n", ptr);
-	
+	/*printf ("<%25d>\n", x);
+	printf("\n");
+	ft_printf ("<%25d>\n", x);
+	printf("\n");*/
+	printf ("<%25s>\n", str);
+	printf("\n");
+	ft_printf ("<%25s>\n", str);
+	printf("\n");
+	printf ("<%-25c>\n", c);
+	printf("\n");
+	ft_printf ("<%-25c>\n", c);
+	printf("\n");
+	printf ("<%-25u || %-25p>\n", x, ptr);
+	printf("\n");
+	ft_printf ("<%-25u || %-25p>\n", x, ptr);
+	printf("\n");
+	printf("<aa%-30p>\n", ptr);
+	printf("\n");
+	ft_printf("<aa%-30p>\n", ptr);
+	printf("\n");
+	int number = 15;
+	printf("|%-10x|\n", number);  
+    ft_printf("|%-10x|\n", number); 
 }

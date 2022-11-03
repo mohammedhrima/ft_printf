@@ -174,8 +174,6 @@ int ft_atoi_for_addZero(const char *s)
 
 	i = 0;
 	res = 0;
-/*	if(s[i] == '-')
-		return (0);*/
 	while (s[i] >= '0' && s[i] <= '9')
 	{
 		res = 10 * res + s[i] - '0';
@@ -207,21 +205,6 @@ int ft_atoi_for_space(const char *s)
 	if (s[i] != 'd' && s[i] != 'i' && s[i] != 'x' && s[i] != 'X' && s[i] != 'p' && s[i] != 's' && s[i] != 'c')
 		return (0);
 	return (res);
-}
-
-int ft_atoi_for_precision(const char *s)
-{
-	int i;
-	int res;
-
-	i = 0;
-	res = 0;
-	while (s[i] >= '0' && s[i] <= '9')
-	{
-		res = 10 * res + s[i] - '0';
-		i++;
-	}
-	return(res);
 }
 
 char *join_char_to_str(char *s, char c)
@@ -339,58 +322,22 @@ size_t ft_strncpy(char *dst, char *src, size_t size)
 	return (ft_strlen(src));
 }
 
-char	*ft_strdup(const char *s)
-{
-	char	*ptr;
-	int		i;
-
-	ptr = (char *)malloc(ft_strlen(s) + 1);
-	if (!ptr)
-		return (NULL);
-	i = 0;
-	while (s[i])
-	{
-		ptr[i] = s[i];
-		i++;
-	}
-	ptr[i] = '\0';
-	return (ptr);
-}
-
-int	ft_strlcpy(char *dst, char *src, int size)
-{
-	unsigned int	j;
-
-	j = 0;
-	if (!size)
-		return (ft_strlen(src));
-	while (j < size - 1 && src[j] != '\0')
-	{
-		dst[j] = src[j];
-		j++;
-	}
-	dst[j] = '\0';
-	return (ft_strlen(src));
-}
-
 // # is handled
 int ft_printf(const char *conv, ...)
 {
-	int len;
+	int len = ft_strlen(conv);
 	int i;
 	int j;
 	int addOX;
 	int addZero;
 	int addSpaceAfter;
+	//int addSpaceBefore;
 	int cutoutput;
 	unsigned int x;
 	long int d;
 	int c;
 	char *s;
-	char*src;
-	int addPlus;
-	int space_to_skip;
-	int precision;
+	int index;
 
 	j = 0;
 	va_list args;
@@ -400,50 +347,32 @@ int ft_printf(const char *conv, ...)
 	addZero = 0;
 	addSpaceAfter = 0;
 	cutoutput = 0;
-	addPlus = 0;
-	precision = 0;
-	len = ft_strlen(conv);
+	index = 0;
+	//addSpaceBefore = 0;
 
 	while (i < len)
 	{
 		if (conv[i] == '%')
 		{
 			i++;
-			space_to_skip = 0;
-			addPlus = 0;
-			precision = 0;
-			while(conv[i] == ' ')
-			{
-				space_to_skip++;
-				i++;
-			}
-			if(space_to_skip && conv[i] != '+')
-				j+=ft_putchar(' ');
-
-			if (conv[i] == '0')
-			{
-				while(conv[i] == '0')
-					i++;
-				addZero = ft_atoi_for_addZero(conv + i);
-				if (addZero)
-					i += lend(addZero);
-			}
 			if (conv[i] == '-')
 			{
-				addZero = 0;
+			//	printf("\n1. index = %d\n", i);
 				while(conv[i] == '-')
 					i++;
+			//	printf("\n2. index = %d\n", i);
+				//printf("conv + i -> %s\n ", conv + i);
 				addSpaceAfter = ft_atoi_for_space(conv + i);
+				//printf("\n\"addspaceafter -> %d it's len -> %d\"\n",addSpaceAfter, lend(addSpaceAfter));
 				if (addSpaceAfter)
-					i += lend(addSpaceAfter);
+					i += lend(addSpaceAfter) ;
+			//	printf("\n3. index = %d\n", i);	
+				/*i++;
+				printf("4. index = %d\n", i);*/
 			}
 			if (conv[i] == '+')
 			{
-				addPlus = 1;
-				while(conv[i] == '+')
-					i++;
-				while(conv[i] == ' ')
-					i++;
+				//is for number to add a plus sign befor it
 			}
 			if (conv[i] == '#')
 			{
@@ -452,28 +381,26 @@ int ft_printf(const char *conv, ...)
 			}
 			if (conv[i] == '.') // add space in case there is number after dot
 			{
-				i++;
-				precision = ft_atoi_for_precision(conv + i);
-				if(precision)
-					i += lend(precision);
+				//	cutoutput = ft_at
 			}
-
+			if (conv[i] == '0')
+			{
+				addZero = ft_atoi_for_addZero(conv + i);
+				if (addZero)
+					i += lend(addZero);
+				i++;
+			}
 			if (conv[i] == 'c')
 			{
 				c = va_arg(args, int);
+			//	j += printSpace(&addSpaceBefore, 1);
 				j += ft_putchar(c);
 				j += printSpace(&addSpaceAfter, 1);
 			}
 			if (conv[i] == 's')
 			{
-				s = va_arg(args,char *);
-				if(precision)
-				{
-					src = malloc(ft_strlen(s));
-					ft_strlcpy(src,s , precision + 1);
-					precision = 0;
-					s = src;
-				}
+				s = va_arg(args, char *);
+				//j += printSpace(&addSpaceBefore, ft_strlen(s));
 				j += ft_putstr(s);
 				j += printSpace(&addSpaceAfter, ft_strlen(s));
 			}
@@ -486,6 +413,7 @@ int ft_printf(const char *conv, ...)
 			if (conv[i] == 'x')
 			{
 				x = (unsigned int)va_arg(args, void *);
+			//	printf("\"-> %u\"\n",x);
 				if (addOX && x)
 				{
 					j += ft_putstr("0x");
@@ -522,16 +450,14 @@ int ft_printf(const char *conv, ...)
 			if (conv[i] == 'd' || conv[i] == 'i')
 			{
 				d = (long int)va_arg(args, int);
-				if(addPlus && d >= 0)
-					j += ft_putchar('+');
 				if (addZero)
 				{
-					addZero -= lend(d) + addPlus;
+					addZero -= lend(d);
 					while (addZero--)
 						j += ft_putchar('0');
 				}
 				j += ft_putnbr(d);
-				j += printSpace(&addSpaceAfter, lend(d) + addPlus);
+				j += printSpace(&addSpaceAfter, lend(d));
 			}
 			if (conv[i] == 'u')
 			{
@@ -544,7 +470,6 @@ int ft_printf(const char *conv, ...)
 				j += printSpace(&addSpaceAfter, j);
 			}
 			i++;
-		//	i -= space_to_skip;
 		}
 		else
 		{
@@ -558,21 +483,142 @@ int ft_printf(const char *conv, ...)
 
 int main(void)
 {
-	int number = 20;
-	char *str = "abcdef";
-	char c = 'x';
+	int number = 150000;
+	char *str = "abcdefghij";
 	// printf("|%+12x|\n", number);  
     // ft_printf("|%+12x|\n", number);
 
-	//printf("|%0010d|%-20s|\n", number, str);  
-	//ft_printf("|%d|%s|\n", number, str);  
+	printf("|%-10d|\n", number);  
+    ft_printf("|%-10d|\n", number);
+	printf("|%-10s|\n", str);  
+    ft_printf("|%-10s|\n", str);
+	
 
-	//printf("|%0010d|%-20s|\n", number, str);  
-	//ft_printf("|%0010d|%-20s|\n", number, str); 
-	//printf("|message ->%         p->%    +     i|\n", &number, number);
-	//ft_printf("|nessage ->%         p->%   +      i|\n", &number, number);
-	printf("|->%.80s|\n",str);
-	ft_printf("|->%.80s|\n",str);
-	printf("|->%.2s|\n",str);
-	ft_printf("|->%.2s|\n",str);
+	/*printf("");
+	printf("\n");
+	ft_printf("");
+	printf("\n=======================================================\n");
+	printf("\x01\x02\a\v\b\f\r\n");
+	printf("\n");
+	ft_printf("\x01\x02\a\v\b\f\r\n");
+	printf("\n=======================================================\n");
+
+	printf("%%");
+	printf("\n");
+	ft_printf("%%");
+	printf("\n=======================================================\n");
+
+	printf(" %%");
+	printf("\n");
+	ft_printf(" %%");
+	printf("\n=======================================================\n");
+
+	printf("%%c");
+	printf("\n");
+	ft_printf("%%c");
+	printf("\n=======================================================\n");
+
+	printf("%%%%%%");
+	printf("\n");
+	ft_printf("%%%%%%");
+	printf("\n=======================================================\n");
+
+	printf("%%%c", 'x');
+	printf("\n");
+	ft_printf("%%%c", 'x');
+	printf("\n=======================================================\n");
+
+	printf("%c", 'x');
+	printf("\n");
+	ft_printf("%c", 'x');
+	printf("\n=======================================================\n");
+
+	printf(" %c", 'x');
+	printf("\n");
+	ft_printf(" %c", 'x');
+	printf("\n=======================================================\n");
+
+	printf("%c ", 'x');
+	printf("\n");
+	ft_printf("%c ", 'x');
+	printf("\n=======================================================\n");
+
+	printf("%c%c%c", 'a', '\t', 'b');
+	printf("\n");
+	ft_printf("%c%c%c", 'a', '\t', 'b');
+	printf("\n=======================================================\n");
+
+	printf("%cc%cc%c", 'a', '\t', 'b');
+	printf("\n");
+	ft_printf("%cc%cc%c", 'a', '\t', 'b');
+	printf("\n=======================================================\n");
+
+	printf("%cs%cs%c", 'c', 'b', 'a');
+	printf("\n");
+	ft_printf("%cs%cs%c", 'c', 'b', 'a');
+	printf("\n=======================================================\n");
+
+	printf("%s", "");
+	printf("\n");
+	ft_printf("%s", "");
+	printf("\n=======================================================\n");*/
+
+	/*("%s", (char *)NULL);
+	printf("\n");
+	ft_printf("%s", (char *)NULL);
+	printf("\n=======================================================\n");
+	printf("%s", "abcdefg");
+	printf("\n");
+	ft_printf("%s", "abcdefg");*/
+   
+	/*printf("%s", "some string with %s hehe");
+	printf("\n");
+	ft_printf("%s", "some string with %s hehe");
+	printf("\n=======================================================\n");
+
+	printf(" %s", "can it handle \t and \n?");
+	printf("\n");
+	ft_printf(" %s", "can it handle \t and \n?");
+	printf("\n=======================================================\n");
+
+	printf("%sx", "{} al$#@@@^&$$^#^@@^$*((&");
+	printf("\n");
+	ft_printf("%sx", "{} al$#@@@^&$$^#^@@^$*((&");
+	printf("\n=======================================================\n");
+
+	printf("%s%s%s", "And ", "some", "joined");
+	printf("\n");
+	ft_printf("%s%s%s", "And ", "some", "joined");
+	printf("\n=======================================================\n");
+
+	printf("%ss%ss%ss", "And ", "some other", "joined");
+	printf("\n");
+	ft_printf("%ss%ss%ss", "And ", "some other", "joined");
+	printf("\n=======================================================\n");
+
+	printf("%p", "");
+	printf("\n");
+	ft_printf("%p", "");
+	printf("\n=======================================================\n");
+
+	printf("%p", NULL);
+	printf("\n");
+	ft_printf("%p", NULL);
+	printf("\n=======================================================\n");
+
+	printf("%p", (void *)-14523);
+	printf("\n");
+	ft_printf("%p", (void *)-14523);
+	printf("\n=======================================================\n");
+
+	printf("0x%p-", (void *)ULONG_MAX);
+	printf("\n");
+	ft_printf("0x%p-", (void *)ULONG_MAX);
+	printf("\n=======================================================\n");
+
+	printf("%pp%p%p", (void *)LONG_MAX + 423856, (void *)0, (void *)INT_MAX);
+	printf("\n");
+	ft_printf("%pp%p%p", (void *)LONG_MAX + 423856, (void *)0, (void *)INT_MAX);
+	printf("\n=======================================================\n");*/
+
 }
