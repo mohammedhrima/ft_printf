@@ -1,7 +1,7 @@
+#include <stdio.h>
 #include <stdarg.h>
 #include <unistd.h>
 #include <limits.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 int ft_strlen(const char *str)
@@ -265,22 +265,16 @@ int lend(long int num) //doesn't count the minus sign
 int lenX(unsigned int num, char *to)
 {
 	unsigned int len = (unsigned)ft_strlen(to);
-	static char *str;
 	int i;
 	int j;
 	i = 0;
-	str = NULL;
 
 	if (num >= 0 && num < len)
-	{
-		str = join_char_to_str(str, to[num]);
 		i++;
-	}
 	if (num >= len)
 	{
 		j = lenX(num / len, to);
 		i += j;
-		str = join_char_to_str(str, to[num % len]);
 		i++;
 	}
 	return (i);
@@ -289,22 +283,16 @@ int lenX(unsigned int num, char *to)
 int lenP(unsigned long long p,  char *to)
 {
 	unsigned long long len = (unsigned long long)ft_strlen(to);
-	static char *str;
 	int i;
 	int j;
 	i = 0;
-	str = NULL;
 
 	if (p >= 0 && p < len)
-	{
-		str = join_char_to_str(str, to[p]);
 		i++;
-	}
 	if (p >= len)
 	{
 		j = lenX(p / len, to);
 		i += j;
-		str = join_char_to_str(str, to[p % len]);
 		i++;
 	}
 	return (i);
@@ -339,38 +327,29 @@ size_t ft_strncpy(char *dst, char *src, size_t size)
 	return (ft_strlen(src));
 }
 
-char	*ft_strdup(const char *s)
+char	*ft_substr(char const *s, unsigned int start, size_t len)
 {
-	char	*ptr;
-	int		i;
+	char			*ptr;
+	unsigned int	i;
 
-	ptr = (char *)malloc(ft_strlen(s) + 1);
+	if (!s)
+		return (NULL);
+	if (start >= ft_strlen(s))
+		return (NULL);
+	if (len > ft_strlen(s) - start)
+		len = ft_strlen(s) - start;
+	ptr = (char *)malloc(len * sizeof(char) + 1);
 	if (!ptr)
 		return (NULL);
 	i = 0;
-	while (s[i])
+	while (i < len && s[start])
 	{
-		ptr[i] = s[i];
+		ptr[i] = s[start];
+		start++;
 		i++;
 	}
 	ptr[i] = '\0';
 	return (ptr);
-}
-
-int	ft_strlcpy(char *dst, char *src, int size)
-{
-	unsigned int	j;
-
-	j = 0;
-	if (!size)
-		return (ft_strlen(src));
-	while (j < size - 1 && src[j] != '\0')
-	{
-		dst[j] = src[j];
-		j++;
-	}
-	dst[j] = '\0';
-	return (ft_strlen(src));
 }
 
 // # is handled
@@ -469,10 +448,10 @@ int ft_printf(const char *conv, ...)
 				s = va_arg(args,char *);
 				if(precision)
 				{
-					src = malloc(ft_strlen(s));
-					ft_strlcpy(src,s , precision + 1);
-					precision = 0;
+					src = ft_substr(s,0,precision);
+					free(s);
 					s = src;
+					precision = 0;
 				}
 				j += ft_putstr(s);
 				j += printSpace(&addSpaceAfter, ft_strlen(s));
@@ -481,7 +460,7 @@ int ft_printf(const char *conv, ...)
 			{
 				unsigned long long p = (unsigned long long)va_arg(args, void *);
 				j += ft_putstr("0x") + convertfromDec_P(p, "0123456789abcdef");
-				j += printSpace(&addSpaceAfter, lenP(p, "0123456789abcdef"));
+				j += printSpace(&addSpaceAfter, lenP(p, "0123456789abcdef") + 2);
 			}
 			if (conv[i] == 'x')
 			{
@@ -556,23 +535,14 @@ int ft_printf(const char *conv, ...)
 	return (j);
 }
 
+
 int main(void)
 {
 	int number = 20;
 	char *str = "abcdef";
 	char c = 'x';
-	// printf("|%+12x|\n", number);  
-    // ft_printf("|%+12x|\n", number);
-
-	//printf("|%0010d|%-20s|\n", number, str);  
-	//ft_printf("|%d|%s|\n", number, str);  
-
-	//printf("|%0010d|%-20s|\n", number, str);  
-	//ft_printf("|%0010d|%-20s|\n", number, str); 
-	//printf("|message ->%         p->%    +     i|\n", &number, number);
-	//ft_printf("|nessage ->%         p->%   +      i|\n", &number, number);
-	printf("|->%.80s|\n",str);
-	ft_printf("|->%.80s|\n",str);
-	printf("|->%.2s|\n",str);
-	ft_printf("|->%.2s|\n",str);
+	printf("|->%-10x|\n",number);
+	ft_printf("|->%-10x|\n",number);
+	printf("|->%-20x|\n",number);
+	ft_printf("|->%-20x|\n",number);
 }
