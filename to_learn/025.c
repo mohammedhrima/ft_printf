@@ -337,10 +337,8 @@ int ft_printf(const char *conv, ...)
 				}
 				else if(conv[i] == '0')
 				{
-					i++;
-					zero = ft_atoi(conv+i);
-					if(conv[i] >= '0' && conv[i] <= '9')
-						i += lend((long)zero);
+					zero = ft_atoi(conv+i+1);
+					i += lend(zero) + 1;
 				}
 				else if(conv[i] == '.')
 				{
@@ -348,6 +346,7 @@ int ft_printf(const char *conv, ...)
 					preci = ft_atoi(conv + i);
 					if(conv[i] >= '0' && conv[i] <= '9')
 						i += lend((long)preci);
+					//printf("conv[%d]->%c | preci=%d\n",i,conv[i],preci);
 				}
 				else if(conv[i] == '#')
 				{
@@ -387,7 +386,7 @@ int ft_printf(const char *conv, ...)
 				while(minus-- > 0)
 					j += ft_putchar(' ');
 			}
-			else if(conv[i] == 'x' || conv[i] == 'X')
+			if(conv[i] == 'x' || conv[i] == 'X')
 			{
 				x = (unsigned int)va_arg(args, void *);
 				if(addOx && x)
@@ -406,55 +405,51 @@ int ft_printf(const char *conv, ...)
 				while(minus-- > 0)
 					j += ft_putchar(' ');
 			}
-			else if(conv[i] == 'd' || conv[i] == 'i')
+			if(conv[i] == 'd' || conv[i] == 'i')
 			{
 				d = (long int)va_arg(args, int);
-				if(preci || d)
+				minus -= lend(d);
+				if(d >= 0 && space )
+					j += ft_putchar(' ');
+				if(plus>0 && d >= 0)
+					j += ft_putchar('+');
+				if(d < 0)
 				{
-					minus -= lend(d);
-					if(d >= 0 && space )
-						j += ft_putchar(' ');
-					if(plus>0 && d >= 0)
-						j += ft_putchar('+');
-					if(d < 0)
-					{
-						j += ft_putchar('-');
-						d = -d;
-						zero--;
-					}
-					zero -= lend(d);
-					while(zero-- > 0)
-						j += ft_putchar('0');
-					preci -= lend(d);
-					while(preci-- > 0)
-						j += ft_putchar('0');
-					j += ft_putnbr(d);
-					while(minus-- > 0)
-						j += ft_putchar(' ');	
-				}	
+					j += ft_putchar('-');
+					d = -d;
+					zero--;
+				}
+				zero -= lend(d);
+				while(zero-- > 0)
+					j += ft_putchar('0');
+				preci -= lend(d);
+				while(preci-- > 0)
+					j += ft_putchar('0');
+				j += ft_putnbr(d);
+				
+				while(minus-- > 0)
+					j += ft_putchar(' ');		
 			}
-			else if (conv[i] == 'u')
+			if (conv[i] == 'u')
 			{
 				u = va_arg(args, unsigned);
-				if(preci || u)
-				{
-					if(plus>0)
+				if(plus>0)
 					j+= ft_putchar('+');
-					zero -= lenU(u);
-					while(zero-- > 0)
-						j += ft_putchar('0');
-					preci -= lenU(u);
-					while(preci-- > 0)
-						j += ft_putchar('0');
-					j += ft_putunsignednbr(u);
-					minus -= lenU(u);
-					while(minus-- > 0)
-						j += ft_putchar(' ');
-				}
+				zero -= lenU(u);
+				while(zero-- > 0)
+					j += ft_putchar('0');
+				preci -= lenU(u);
+				while(preci-- > 0)
+					j += ft_putchar('0');
+				j += ft_putunsignednbr(u);
+				minus -= lenU(u);
+				while(minus-- > 0)
+					j += ft_putchar(' ');
 			}
-			else if (conv[i] == '%')
+			
+			if (conv[i] == '%')
 			{
-				j += ft_putchar(conv[i]);
+				j += ft_putchar('%');
 				minus -= 1;//len of char
 				while(minus-- > 0)
 					j += ft_putchar(' ');
@@ -463,11 +458,122 @@ int ft_printf(const char *conv, ...)
 		}
 		else
 		{
+		//	ft_putchar('\\');
 			j += ft_putchar(conv[i]);
+			//printf("\nI did write %d char \n", j);
+			//j += ft_putchar('x');
+		//	ft_putchar('\\');
 			i++;
 		}
 	}
 	
 	va_end(args);
 	return(j);
+}
+
+int main(void)
+{
+	int n,m;
+	//n = printf("|%5%|");
+	//printf("\n");
+	//m = ft_printf("|%5%|");
+	//printf("\n");
+	//printf("n=%d m=%d\n",n,m);
+	//printf("\n=============================\n\n");
+	n = printf("|%+5%|");
+	printf("\n");
+	m = ft_printf("|%+5%|");
+	printf("\n");
+	printf("n=%d m=%d\n",n,m);
+	printf("\n=============================\n\n");
+	n = printf("|%-05%|");
+	printf("\n");
+	m = ft_printf("|%-05%|");
+	printf("\n");
+	printf("n=%d m=%d\n",n,m);
+	printf("\n=============================\n\n");
+	// n = printf("|%23s|", NULL);
+	// printf("\n");
+	// m = ft_printf("|%23s|", NULL);
+	// printf("\n");
+	// printf("n=%d m=%d\n",n,m);
+	// printf("\n=============================\n\n");
+	n = printf("|%.s|", NULL);
+	printf("\n");
+	m = ft_printf("|%.s|", NULL);
+	printf("\n");
+	printf("|n=%d m=%d\n",n,m);
+	printf("\n=============================\n\n");
+	// n = printf("|%32s|", "abc");
+	// printf("\n");
+	// m = ft_printf("|%32s|", "abc");
+	// printf("\n");
+	// printf("n=%d m=%d\n",n,m);
+	// printf("\n=============================\n\n");
+	// n = printf("|%16s|", "nark nark");
+	// printf("\n");
+	// m = ft_printf("|%16s|", "nark nark");
+	// printf("\n");
+	// printf("n=%d m=%d\n",n,m);
+	// printf("\n=============================\n\n");
+	// n = printf("|%5s|", "goes over");
+	// printf("\n");
+	// m = ft_printf("|%5s|", "goes over");
+	// printf("\n");
+	// printf("n=%d m=%d\n",n,m);
+	// printf("\n=============================\n\n");
+	n = printf("|%.5s%.7s|", "yo", "boi");
+	printf("\n");
+	m = ft_printf("|%.5s%.7s|", "yo", "boi");
+	printf("\n");
+	printf("n=%d m=%d\n",n,m);
+	printf("\n=============================\n\n");
+	n = printf("|%.5s|", "yolo");
+	printf("\n");
+	m = ft_printf("|%.5s|", "yolo");
+	printf("\n");
+	printf("n=%d m=%d\n",n,m);
+	printf("\n=============================\n\n");
+	n = printf("|%.5s|", "bombastic");
+	printf("\n");
+	m = ft_printf("|%.5s|", "bombastic");
+	printf("\n");
+	printf("n=%d m=%d\n",n,m);
+	printf("\n=============================\n\n");
+	n = printf("|%.5s|", "tubular");
+	printf("\n");
+	m = ft_printf("|%.5s|", "tubular");
+	printf("\n");
+	printf("n=%d m=%d\n",n,m);
+	printf("\n=============================\n\n");
+	n = printf("|%.7s%.7s|", "hello", "world");
+	printf("\n");
+	m = ft_printf("|%.7s%.7s|", "hello", "world");
+	printf("\n");
+	printf("n=%d m=%d\n",n,m);
+	printf("\n=============================\n\n");
+	n = printf("|%.7s%.7s|", "hello", "world");
+	printf("\n");
+	m = ft_printf("|%.7s%.7s|", "hello", "world");
+	printf("\n");
+	printf("n=%d m=%d\n",n,m);
+	printf("\n=============================\n\n");
+	n = printf("|%.7s%.7s|", "hello", "world");
+	printf("\n");
+	m = ft_printf("|%.7s%.7s|", "hello", "world");
+	printf("\n");
+	printf("n=%d m=%d\n",n,m);
+	printf("\n=============================\n\n");
+	n = printf("|%.7s%.7s|", "hello", "world");
+	printf("\n");
+	m = ft_printf("|%.7s%.7s|", "hello", "world");
+	printf("\n");
+	printf("n=%d m=%d\n",n,m);
+	printf("\n=============================\n\n");
+	n = printf("|%.3s%.7s|", "hello", "world");
+	printf("\n");
+	m= ft_printf("|%.3s%.7s|", "hello", "world");
+	printf("\n");
+	printf("n=%d m=%d\n",n,m);
+	printf("\n=============================\n\n");
 }
