@@ -21,5 +21,5 @@ int max(int num_args,...)
 
 int main(void)
 {
-	int res = max(5,25,68,79,16,58);
+	int res = max(5,(25,68,79,16,58));
 }

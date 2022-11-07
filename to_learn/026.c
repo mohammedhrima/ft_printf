@@ -359,8 +359,7 @@ int ft_printf(const char *conv, ...)
 					space = 1;
 					while(conv[i] == ' ')
 						i++;
-				}	
-		
+				}
 			}
 			if(conv[i] == 'c')
 			{

@@ -179,16 +179,18 @@ int lenX(unsigned int num)
 	return (i);
 }
 
-int lenP(unsigned long long p)
+int lenP(void* p1)
 {
 	int i;
 	int j;
+	unsigned long long p;
 
+	p = (unsigned long long)p1;
 	i = 0;
 	if (p >= 0 && p < 16)
 		i++;
 	if (p >= 16)
-		i += lenP(p / 16) + 1;
+		i += lenP((void*)(p / 16)) + 1;
 	return (i);
 }
 
@@ -216,13 +218,15 @@ int printSpace(int *addSpace)
 	return (i);
 }
 
-int convertfromDec_P(unsigned long long num)
+int convertfromDec_P(void *num1)
 {
 	int i;
 	int j;
 	i = 0;
 	char *to;
+	unsigned long long num;
 
+	num = (unsigned long long)num1;
 	to = "0123456789abcdef";
 	if (num >= 0 && num < 16)
 	{
@@ -233,7 +237,7 @@ int convertfromDec_P(unsigned long long num)
 	}
 	if (num >= 16)
 	{
-		j = convertfromDec_P(num / 16);
+		j = convertfromDec_P((void *)(num / 16));
 		if (j < 0)
 			return (-1);
 		i += j;
@@ -298,7 +302,7 @@ int ft_printf(const char *conv, ...)
 	char	*s;
 	long int d;
 	unsigned long u;
-	unsigned long long p;
+	void* p;
 	unsigned int x;
 	va_list args;
 
@@ -307,7 +311,6 @@ int ft_printf(const char *conv, ...)
 	j = 0;
 	while (i < ft_strlen(conv))
 	{
-		//printf("step 1");
 		minus = -1;//add space after
 		zero = -1;
 		addOx = 0;
@@ -373,7 +376,6 @@ int ft_printf(const char *conv, ...)
 			else if (conv[i] == 's')
 			{
 				s = va_arg(args, char *);
-				//printf("string is %s\n\n",s);
 				j += ft_putstr(s,preci);
 				minus -= ft_strlen(s);
 				while(minus-- > 0)
@@ -381,7 +383,7 @@ int ft_printf(const char *conv, ...)
 			}
 			if(conv[i] == 'p')
 			{
-				p = (unsigned long long)va_arg(args, void*);
+				p = va_arg(args, void*);
 				j += ft_putstr("0x",-1) + convertfromDec_P(p);
 				minus -= (lenP(p) + 2);
 				while(minus-- > 0)
@@ -470,4 +472,18 @@ int ft_printf(const char *conv, ...)
 	
 	va_end(args);
 	return(j);
+}
+
+int main(void)
+{
+	//int n = 55;
+	/*ft_printf("->%l");
+	printf("\n");
+	printf("->%l");
+	printf("\n");*/
+	int n = printf("%.4s","123456789");
+	printf("\n");
+	int m = ft_printf("%.4s","123456789");
+printf("\nn = %d m=%d",n ,m);
+
 }
